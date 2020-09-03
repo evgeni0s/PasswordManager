@@ -4,7 +4,9 @@ using System.Text;
 
 namespace Backend
 {
-    class XmlRootElement
+    [Serializable]
+    public class XmlRootElement
     {
+        public List<SettingsModel> SettingsModels { get; set; }
     }
 }

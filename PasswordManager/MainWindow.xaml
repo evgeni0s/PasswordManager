@@ -4,9 +4,104 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GUI"
+        xmlns:converters="clr-namespace:GUI.Converters"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        StateChanged="Window_StateChanged"
+        Closing="Window_Closing"
+        Title="Password Manager" Height="500" Width="1000" 
+        >
+    <Window.Resources>
+        <ContextMenu x:Key="NotifierContextMenu" Placement="MousePoint">
+            <MenuItem Header="Settings" Click="Menu_Settings"></MenuItem>
+            <MenuItem Header="Exit" Click="Menu_Close"></MenuItem>
+        </ContextMenu>
+        <converters:PasswordConverter x:Key="PasswordConverter"/>
+        <converters:BooleanToVisibilityConverterTwoWay x:Key="BooleanToVisibilityConverterInverted" True="Collapsed" False="Visible"/>
+        <converters:BooleanToVisibilityConverterTwoWay x:Key="BooleanToVisibilityConverter" True="Visible" False="Collapsed"/>
+        <converters:ApplicationNameConverter x:Key="ApplicationNameConverter"/>
+        <converters:HotKeyConverter x:Key="HotKeyConverter"/>
+        <Style TargetType="ListViewItem">
+            <Style.Triggers>
+                <Trigger Property="ItemsControl.AlternationIndex" Value="0">
+                    <Setter Property="Background" Value="Bisque"/>
+                </Trigger>
+                <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                    <Setter Property="Background" Value="White"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid x:Name="PrimaryPasswordForm"
+              Visibility="{Binding IsPrimaryPasswordFormVisible,
+              Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Label FontSize="20" Opacity="0.4" FontWeight="DemiBold" HorizontalAlignment="Center" VerticalAlignment="Center">Type in password(optional) and press Enter</Label>
+            <PasswordBox x:Name="PasswordBox" Grid.Row="1" KeyDown="PasswordBox_KeyDown" Width="200" VerticalAlignment="Center" FontSize="18"/>
+            <Button Grid.Row="1" 
+                    Command="{Binding NewConfigurationCommand}" 
+                    VerticalAlignment="Center" 
+                    HorizontalAlignment="Right"
+                    Visibility="{Binding IsNewConfigurationVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                New configuration
+            </Button>
+        </Grid>
+
+        <ListView x:Name="Settings" Visibility="{Binding IsSettingsVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <ListBoxItem>Password Settings</ListBoxItem>
+            <ListBoxItem>
+                <DataGrid x:Name="SettingsGrid"
+                          DataContext="{Binding SettingsViewModel}"
+                          ItemsSource="{Binding Path=Settings}"
+                          AutoGenerateColumns="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Binding="{Binding ApplicationName, Converter={StaticResource ApplicationNameConverter}, Mode=TwoWay}" Header="Application Name" IsReadOnly="False"/>
+                        <DataGridTextColumn Binding="{Binding Password, Converter={StaticResource PasswordConverter}, Mode=TwoWay}" Header="Password" IsReadOnly="False"/>
+                        <DataGridTextColumn Binding="{Binding Hotkey, Converter={StaticResource HotKeyConverter}, Mode=TwoWay}" Header="Hotkey" IsReadOnly="False"/>
+                        <DataGridCheckBoxColumn Binding="{Binding IsHandled}" Header="Is Hotkey handled" IsReadOnly="False"/>
+                        <DataGridTemplateColumn>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="Delete" Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext.DeleteRowCommand}" CommandParameter="{Binding}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </ListBoxItem>
+        </ListView>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="2"
+                    Visibility="{Binding IsPrimaryPasswordFormVisible, Converter={StaticResource BooleanToVisibilityConverterInverted}}">
+            <Button Width="50" Command="{Binding NewPasswordCommand}">New</Button>
+            <Button Width="50" Margin="5 0 0 0" Command="{Binding SaveSettingsCommand}">Save</Button>
+            <Button Width="50" Margin="5 0 0 0" Click="Menu_Close">Exit</Button>
+        </StackPanel>
+
+        <!--Bottom panel-->
+        <Grid Grid.Row="2" Height="200"
+              Visibility="{Binding IsPrimaryPasswordFormVisible,
+              Converter={StaticResource BooleanToVisibilityConverterInverted}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Label FontSize="15">Logs</Label>
+            <TextBox x:Name="LogTextBox"
+                       Grid.Row="1" HorizontalAlignment="Stretch"
+                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                       ScrollViewer.VerticalScrollBarVisibility="Auto"
+                       TextChanged="LogTextBox_TextChanged">
+                
+            </TextBox>
+        </Grid>
     </Grid>
 </Window>

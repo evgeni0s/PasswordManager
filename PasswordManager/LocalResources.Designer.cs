@@ -59,5 +59,25 @@ namespace GUI {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon key2 {
+            get {
+                object obj = ResourceManager.GetObject("key2", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] Tray_icon {
+            get {
+                object obj = ResourceManager.GetObject("Tray_icon", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
     }
 }
